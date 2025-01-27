@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './user.entity';
+import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { userSchema } from './user.schema';
+import { userSchema } from '../schemas/user.schema';
 import { z } from 'zod';
-import { UserResponse } from './user.response';
+import { UserResponse } from '../responses/user.response';
 
 @Injectable()
 export class UserService {
