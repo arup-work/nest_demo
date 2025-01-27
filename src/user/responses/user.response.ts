@@ -1,7 +1,7 @@
 import { User } from "../entities/user.entity";
 
-export interface UserResponse{
+export interface UserResponse <response = object | object[]>{
     statusCode: number,
     message: string,
-    data: Partial<User>
+    data: response
 }
