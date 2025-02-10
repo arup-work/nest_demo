@@ -3,6 +3,8 @@ import { UserService } from '../services/user.service';
 import { User } from '../entities/user.entity';
 import { UserResponse } from '../responses/user.response';
 import { CreateUserDto } from '../dto/create-user.dto';
+import { LoginDto } from '../dto/login.dto';
+import { response } from 'src/helpers/interfaces';
 
 
 
@@ -13,6 +15,11 @@ export class UserController {
     @Post('register')
     async register(@Body() createUserDto: CreateUserDto): Promise<UserResponse>{
         return this.userService.register(createUserDto);
+    }
+
+    @Post('login')
+    async login(@Body() loginDto: LoginDto): Promise<response>{
+        return this.userService.login(loginDto);
     }
 
 }

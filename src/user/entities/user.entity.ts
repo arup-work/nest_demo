@@ -1,5 +1,6 @@
 import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+import * as bcrypt from 'bcrypt';
 
 @Entity()
 export class User {
@@ -29,4 +30,10 @@ export class User {
   generateUuid() {
     this.uuid = uuidv4();
   }
+
+  validatePassword(
+    password: string,
+  ): Promise<boolean> {
+    return bcrypt.compare(password, this.password);
+  };
 }

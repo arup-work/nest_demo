@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
@@ -6,11 +6,15 @@ import * as bcrypt from 'bcrypt';
 import { userSchema } from '../schemas/user.schema';
 import { z } from 'zod';
 import { UserResponse } from '../responses/user.response';
+import { LoginDto } from '../dto/login.dto';
+import { AuthUserInterface, response } from 'src/helpers/interfaces';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async register(user: Partial<User>): Promise<UserResponse> {
@@ -52,5 +56,31 @@ export class UserService {
       }
       throw error;
     }
+  }
+
+  async login({ email, password}: LoginDto){
+    const user = await this.userRepository.findOne({ where: {email}});
+    if (!user) {
+      throw new BadRequestException('Invalid email or password');
+    }
+
+    if (!await user.validatePassword(password)) {
+      throw new UnauthorizedException('Invalid credential');
+    }
+
+    const tokenPayload: AuthUserInterface = {
+      email: user.email,
+      userId: user.id,
+    };
+
+    const accessToken = this.jwtService.sign(tokenPayload, { expiresIn: '1d' });
+    const refreshToken = this.jwtService.sign(tokenPayload);
+
+    return {
+      statusCode: 200,
+      response: { ...user,password: undefined, accessToken },
+      message: "Login successful"
+    };
+
   }
 }
